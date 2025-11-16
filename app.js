@@ -9,6 +9,12 @@ import passport from "./config/passport.js";
 import bcrypt from "bcryptjs";
 import pool from "./db/pool.js";
 
+import {
+  validateSignup,
+  validateLogin,
+} from "./middlewares/validationHandler.js";
+import { matchedData, validationResult } from "express-validator";
+
 const app = express();
 
 app.set("view engine", "ejs");
@@ -21,10 +27,15 @@ app.use(passport.session());
 app.use(currentUserHandler);
 
 app.get("/", (req, res) => res.render("index", { user: req.user }));
-app.get("/sign-up", (req, res) => res.render("sign-up"));
-app.post("/sign-up", async (req, res, next) => {
+
+app.get("/sign-up", (req, res) => res.render("sign-up", { errors: null }));
+app.post("/sign-up", validateSignup, async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.render("sign-up", { errors: errors.array() });
+  }
+  const body = matchedData(req);
   try {
-    const body = req.body;
     const hash = await bcrypt.hash(body.password, 10);
     await pool.query(
       "INSERT INTO users (first_name, last_name, password, email, membership_status) VALUES ($1, $2, $3, $4, $5)",
@@ -35,9 +46,18 @@ app.post("/sign-up", async (req, res, next) => {
     next(error);
   }
 });
-app.get("/log-in", (req, res) => res.render("log-in"));
+
+app.get("/log-in", (req, res) => res.render("log-in", { errors: null }));
 app.post(
   "/log-in",
+  validateLogin,
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.render("log-in", { errors: errors.array() });
+    }
+    next();
+  },
   passport.authenticate("local", { successRedirect: "/", failureRedirect: "/" })
 );
 app.get("/log-out", (req, res, next) => {
