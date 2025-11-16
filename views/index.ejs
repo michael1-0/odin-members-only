@@ -10,7 +10,12 @@
     <%- include('partials/header') %>
 
     <main>
-      <p>This is the homepage.</p>
+      <% if (locals.user) {%>
+      <h1>Welcome, <%= user.first_name %></h1>
+      <a href="/log-out">LOG OUT</a>
+      <% } else { %>
+      <p>You are not currently logged in.</p>
+      <% } %>
     </main>
 
     <%- include('partials/footer') %>
