@@ -3,7 +3,7 @@ import express, { urlencoded, static as static_ } from "express";
 
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { currentUserHandler } from "./middlewares/currentUserHandler.js";
-import sessionHandler from "./middlewares/session.js";
+import sessionHandler from "./middlewares/sessionHandler.js";
 import passport from "./config/passport.js";
 
 import bcrypt from "bcryptjs";
