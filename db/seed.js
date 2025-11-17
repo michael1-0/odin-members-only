@@ -17,9 +17,11 @@ CREATE TABLE users (
 
 CREATE TABLE messages (
   message_id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  user_id INTEGER NOT NULL,
   title VARCHAR(100),
   timestamp TIMESTAMP,
-  text TEXT
+  text TEXT,
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE "session" (
