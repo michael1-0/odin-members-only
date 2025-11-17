@@ -3,9 +3,13 @@
     <h1>Members Only</h1>
     <ul>
       <li><a href="/">Home</a></li>
-      <li><a href="/log-in">Login</a></li>
+      <% if (!locals.currentUser) { %>
       <li><a href="/sign-up">Signup</a></li>
+      <li><a href="/log-in">Login</a></li>
+      <% } else { %>
+      <% if (!locals.currentUser.membership_status) { %>
       <li><a href="/club">Club</a></li>
+      <% } %> <% } %>
     </ul>
   </nav>
 </header>

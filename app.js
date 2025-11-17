@@ -38,11 +38,17 @@ app.post("/sign-up", validateSignup, async (req, res, next) => {
   const body = matchedData(req);
   try {
     const hash = await bcrypt.hash(body.password, 10);
-    await pool.query(
-      "INSERT INTO users (first_name, last_name, password, email, membership_status) VALUES ($1, $2, $3, $4, $5)",
+    const { rows } = await pool.query(
+      "INSERT INTO users (first_name, last_name, password, email, membership_status) VALUES ($1, $2, $3, $4, $5) RETURNING *",
       [body.first_name, body.last_name, hash, body.email, false]
     );
-    return res.redirect("/");
+    const newUser = rows[0];
+    req.logIn(newUser, (err) => {
+      if (err) {
+        throw err;
+      }
+      return res.redirect("/");
+    });
   } catch (error) {
     next(error);
   }
