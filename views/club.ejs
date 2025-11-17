@@ -10,13 +10,12 @@
     <%- include('partials/header') %>
 
     <main>
-      <% if (locals.currentUser) {%>
-      <h1>Welcome, <%= currentUser.first_name %></h1>
-      <p>member: <%= currentUser.membership_status %></p>
-      <a href="/log-out">LOG OUT</a>
-      <% } else { %>
-      <p>You are not currently logged in.</p>
-      <% } %>
+      <h1>Register Club</h1>
+      <form action="/club" method="POST">
+        <label for="secret">Secret code:</label>
+        <input type="password" id="secret" name="secret" required />
+        <button type="submit">Submit</button>
+      </form>
     </main>
 
     <%- include('partials/footer') %>

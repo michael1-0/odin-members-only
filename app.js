@@ -7,6 +7,7 @@ import sessionHandler from "./middlewares/sessionHandler.js";
 import passport from "./config/passport.js";
 
 import bcrypt from "bcryptjs";
+import { getSecret } from "./secret.js";
 import pool from "./db/pool.js";
 
 import {
@@ -73,6 +74,24 @@ app.get("/log-out", (req, res, next) => {
       res.redirect("/");
     });
   });
+});
+
+app.get("/club", (req, res) => res.render("club"));
+app.post("/club", async (req, res, next) => {
+  const body = req.body;
+  const serverSecret = getSecret();
+  if (serverSecret !== body.secret) {
+    return res.redirect("/club");
+  }
+  try {
+    await pool.query(
+      "UPDATE users SET membership_status = $1 WHERE user_id = $2",
+      [true, res.locals.currentUser.user_id]
+    );
+    res.redirect("/");
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.use(errorHandler);
