@@ -27,7 +27,19 @@ app.use(sessionHandler);
 app.use(passport.session());
 app.use(currentUserHandler);
 
-app.get("/", (req, res) => res.render("index", { user: req.user }));
+app.get("/", async (req, res, next) => {
+  if (!res.locals.currentUser) {
+    return res.render("index", { messages: null });
+  }
+  try {
+    const { rows } = await pool.query(
+      "SELECT messages.title, messages.timestamp, messages.text, users.first_name, users.membership_status FROM messages JOIN users ON messages.user_id = users.user_id;"
+    );
+    res.render("index", { messages: rows});
+  } catch (error) {
+    next(error);
+  }
+});
 
 app.get("/sign-up", (req, res) => res.render("sign-up", { errors: null }));
 app.post("/sign-up", validateSignup, async (req, res, next) => {
@@ -93,6 +105,29 @@ app.post("/club", async (req, res, next) => {
     await pool.query(
       "UPDATE users SET membership_status = $1 WHERE user_id = $2",
       [true, res.locals.currentUser.user_id]
+    );
+    res.redirect("/");
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/message", (req, res) => {
+  if (!res.locals.currentUser) {
+    return res.redirect("/log-in");
+  }
+  res.render("message");
+});
+app.post("/message", async (req, res, next) => {
+  if (!res.locals.currentUser) {
+    return res.redirect("/log-in");
+  }
+  const body = req.body;
+  const currentUserId = res.locals.currentUser.user_id;
+  try {
+    await pool.query(
+      "INSERT INTO messages (user_id, title, text, timestamp) VALUES ($1, $2, $3, $4)",
+      [currentUserId, body.title, body.text, new Date().toISOString()]
     );
     res.redirect("/");
   } catch (error) {
