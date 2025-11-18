@@ -7,9 +7,13 @@
       <li><a href="/sign-up">Signup</a></li>
       <li><a href="/log-in">Login</a></li>
       <% } else { %>
-      <% if (!locals.currentUser.membership_status) { %>
-      <li><a href="/club">Club</a></li>
-      <% } %> <% } %>
+        <% if (!locals.currentUser.membership_status) { %>
+        <li><a href="/club">Club</a></li>
+        <% } %>
+        <% if (!locals.currentUser.admin) { %>
+        <li><a href="/admin">Admin</a></li>
+        <% } %>
+      <% } %>
     </ul>
   </nav>
 </header>

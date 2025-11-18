@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <%- include('partials/header') %>
+
+    <main>
+      <h1>Register Club</h1>
+      <form action="/admin" method="POST">
+        <label for="secret">What's one + one?</label>
+        <input type="password" id="secret" name="secret" required />
+        <button type="submit">Submit</button>
+      </form>
+    </main>
+
+    <%- include('partials/footer') %>
+  </body>
+</html>

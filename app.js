@@ -7,7 +7,7 @@ import sessionHandler from "./middlewares/sessionHandler.js";
 import passport from "./config/passport.js";
 
 import bcrypt from "bcryptjs";
-import { getSecret } from "./secret.js";
+import { getSecret, getAdminSecret } from "./secret.js";
 import pool from "./db/pool.js";
 
 import {
@@ -30,7 +30,7 @@ app.use(currentUserHandler);
 app.get("/", async (req, res, next) => {
   try {
     const { rows } = await pool.query(
-      "SELECT messages.title, messages.timestamp, messages.text, users.first_name, users.membership_status FROM messages JOIN users ON messages.user_id = users.user_id;"
+      "SELECT messages.message_id, messages.title, messages.timestamp, messages.text, users.first_name, users.membership_status FROM messages JOIN users ON messages.user_id = users.user_id;"
     );
     res.render("index", { messages: rows });
   } catch (error) {
@@ -129,6 +129,50 @@ app.post("/message", async (req, res, next) => {
       "INSERT INTO messages (user_id, title, text, timestamp) VALUES ($1, $2, $3, $4)",
       [currentUserId, body.title, body.text, new Date().toISOString()]
     );
+    res.redirect("/");
+  } catch (error) {
+    next(error);
+  }
+});
+app.post("/message/:id", async (req, res, next) => {
+  if (!req.user.admin) {
+    return res.redirect("/admin");
+  }
+  const messageId = req.params.id;
+  try {
+    await pool.query("DELETE FROM messages WHERE message_id = $1", [messageId]);
+    res.redirect("/");
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/admin", (req, res) => {
+  if (req.isUnauthenticated()) {
+    return res.redirect("/log-in");
+  }
+  if (req.user.admin) {
+    return res.redirect("/");
+  }
+  res.render("admin");
+});
+app.post("/admin", async (req, res, next) => {
+  if (req.isUnauthenticated()) {
+    return res.redirect("/log-in");
+  }
+  if (req.user.admin) {
+    return res.redirect("/");
+  }
+  const body = req.body;
+  const serverSecret = getAdminSecret();
+  if (serverSecret !== body.secret) {
+    return res.redirect("/admin");
+  }
+  try {
+    await pool.query("UPDATE users SET admin = $1 WHERE user_id = $2", [
+      true,
+      req.user.user_id,
+    ]);
     res.redirect("/");
   } catch (error) {
     next(error);

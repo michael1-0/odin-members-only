@@ -10,4 +10,12 @@ function getSecret() {
   }
 }
 
-export { getSecret };
+function getAdminSecret() {
+  if (process.env.ADMIN_SECRET) {
+    return process.env.ADMIN_SECRET;
+  } else {
+    throw new Error("ADMIN_SECRET not set");
+  }
+}
+
+export { getSecret, getAdminSecret };

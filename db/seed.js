@@ -12,7 +12,8 @@ CREATE TABLE users (
   last_name VARCHAR(255),
   email VARCHAR(255),
   password VARCHAR(60),
-  membership_status BOOLEAN
+  membership_status BOOLEAN,
+  admin BOOLEAN DEFAULT false
 );
 
 CREATE TABLE messages (

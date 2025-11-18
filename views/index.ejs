@@ -13,6 +13,7 @@
       <% if (locals.currentUser) {%>
       <h1>Welcome, <%= currentUser.first_name %></h1>
       <p>member: <%= currentUser.membership_status %></p>
+      <p>admin: <%= currentUser.admin %></p>
       <a href="/message">New Message</a>
       <a href="/log-out">LOG OUT</a>
       <% } else { %>
@@ -26,6 +27,15 @@
               <p><strong><%= message.title %>:</strong> <%= message.text %></p>
               <p><strong>author: </strong><%= locals.currentUser && locals.currentUser.membership_status ? message.first_name : "anonymous" %> </p>
               <p class="timestamp"><%= locals.currentUser && locals.currentUser.membership_status ? message.timestamp : "anonymous" %></p>
+              <% if (locals.currentUser && locals.currentUser.admin) { %>
+                <form
+                action="/message/<%= message.message_id  %>"
+                method="POST"
+                onsubmit="return confirm('Are you sure you want to delete this?')"
+                >
+                  <button type="submit">delete</button>
+                </form>
+              <% } %>
             </div>
           <% }) %>
         <% } else { %>
