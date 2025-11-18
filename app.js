@@ -135,6 +135,9 @@ app.post("/message", async (req, res, next) => {
   }
 });
 app.post("/message/:id", async (req, res, next) => {
+  if (req.isUnauthenticated()) {
+    return res.redirect("/log-in");
+  }
   if (!req.user.admin) {
     return res.redirect("/admin");
   }
