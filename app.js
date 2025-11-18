@@ -75,7 +75,7 @@ app.post(
     }
     next();
   },
-  passport.authenticate("local", { successRedirect: "/", failureRedirect: "/" })
+  passport.authenticate("local", { successRedirect: "/", failureRedirect: "/log-in" })
 );
 app.get("/log-out", (req, res, next) => {
   req.logOut((err) => {
