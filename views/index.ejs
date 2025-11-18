@@ -30,7 +30,7 @@
               <p class="timestamp"><%= locals.currentUser && locals.currentUser.membership_status ? message.timestamp : "date hidden" %></p>
               <% if (locals.currentUser && locals.currentUser.admin) { %>
                 <form
-                style="padding: 0;"
+                style="min-width: 100%;padding: 0;"
                 action="/message/<%= message.message_id  %>"
                 method="POST"
                 onsubmit="return confirm('Are you sure you want to delete this?')"
