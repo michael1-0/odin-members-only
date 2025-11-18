@@ -110,6 +110,10 @@ header a {
   border-radius: 5px;
 }
 
+.error-messages {
+  margin-bottom: 1rem;
+}
+
 /* Main Content */
 main {
   display: flex;
