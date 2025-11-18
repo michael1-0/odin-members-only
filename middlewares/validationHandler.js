@@ -1,4 +1,5 @@
 import { body } from "express-validator";
+import pool from "../db/pool.js";
 
 const validateSignup = [
   body("first_name")
@@ -27,7 +28,17 @@ const validateSignup = [
     .withMessage("Must be a valid email address")
     .normalizeEmail()
     .isLength({ max: 255 })
-    .withMessage("Email must not exceed 255 characters"),
+    .withMessage("Email must not exceed 255 characters")
+    .custom(async (value) => {
+      const { rows } = await pool.query(
+        "SELECT * FROM users WHERE email = $1",
+        [value]
+      );
+      if (rows.length > 0) {
+        throw new Error("Email already in use");
+      }
+      return true;
+    }),
 
   body("password")
     .notEmpty()
@@ -56,9 +67,7 @@ const validateLogin = [
     .isEmail()
     .withMessage("Must be a valid email address"),
 
-  body("password")
-    .notEmpty()
-    .withMessage("Password is required"),
+  body("password").notEmpty().withMessage("Password is required"),
 ];
 
 const validateMessage = [
