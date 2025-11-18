@@ -61,4 +61,20 @@ const validateLogin = [
     .withMessage("Password is required"),
 ];
 
-export { validateSignup, validateLogin };
+const validateMessage = [
+  body("title")
+    .trim()
+    .notEmpty()
+    .withMessage("Title is required")
+    .isLength({ min: 1, max: 100 })
+    .withMessage("Title must be between 1 and 100 characters"),
+
+  body("text")
+    .trim()
+    .notEmpty()
+    .withMessage("Message text is required")
+    .isLength({ min: 1, max: 1000 })
+    .withMessage("Message text must be between 1 and 1000 characters"),
+];
+
+export { validateSignup, validateLogin, validateMessage };

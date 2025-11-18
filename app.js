@@ -13,6 +13,7 @@ import pool from "./db/pool.js";
 import {
   validateSignup,
   validateLogin,
+  validateMessage,
 } from "./middlewares/validationHandler.js";
 import { matchedData, validationResult } from "express-validator";
 
@@ -116,13 +117,17 @@ app.get("/message", (req, res) => {
   if (req.isUnauthenticated()) {
     return res.redirect("/log-in");
   }
-  res.render("message");
+  res.render("message", { errors: null });
 });
-app.post("/message", async (req, res, next) => {
+app.post("/message", validateMessage, async (req, res, next) => {
   if (req.isUnauthenticated()) {
     return res.redirect("/log-in");
   }
-  const body = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.render("message", { errors: errors.array() });
+  }
+  const body = matchedData(req);
   const currentUserId = req.user.user_id;
   try {
     await pool.query(
