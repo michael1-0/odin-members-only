@@ -24,9 +24,10 @@
         <% if (messages && messages.length > 0) { %>
           <% messages.forEach(function(message) { %>
             <div class="message" style="border: 1px solid black;">
-              <p><strong><%= message.title %>:</strong> <%= message.text %></p>
-              <p><strong>author: </strong><%= locals.currentUser && locals.currentUser.membership_status ? message.first_name : "anonymous" %> </p>
-              <p class="timestamp"><%= locals.currentUser && locals.currentUser.membership_status ? message.timestamp : "anonymous" %></p>
+              <h3><%= message.title %></h3>
+              <p><%= message.text %></p>
+              <p>by <%= locals.currentUser && locals.currentUser.membership_status ? message.first_name : "anonymous" %> </p>
+              <p class="timestamp"><%= locals.currentUser && locals.currentUser.membership_status ? message.timestamp : "date hidden" %></p>
               <% if (locals.currentUser && locals.currentUser.admin) { %>
                 <form
                 action="/message/<%= message.message_id  %>"
