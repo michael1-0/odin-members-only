@@ -28,14 +28,11 @@ app.use(passport.session());
 app.use(currentUserHandler);
 
 app.get("/", async (req, res, next) => {
-  if (!res.locals.currentUser) {
-    return res.render("index", { messages: null });
-  }
   try {
     const { rows } = await pool.query(
       "SELECT messages.title, messages.timestamp, messages.text, users.first_name, users.membership_status FROM messages JOIN users ON messages.user_id = users.user_id;"
     );
-    res.render("index", { messages: rows});
+    res.render("index", { messages: rows });
   } catch (error) {
     next(error);
   }
@@ -96,6 +93,9 @@ app.get("/log-out", (req, res, next) => {
 
 app.get("/club", (req, res) => res.render("club"));
 app.post("/club", async (req, res, next) => {
+  if (req.isUnauthenticated()) {
+    return res.redirect("/log-in");
+  }
   const body = req.body;
   const serverSecret = getSecret();
   if (serverSecret !== body.secret) {
@@ -104,7 +104,7 @@ app.post("/club", async (req, res, next) => {
   try {
     await pool.query(
       "UPDATE users SET membership_status = $1 WHERE user_id = $2",
-      [true, res.locals.currentUser.user_id]
+      [true, req.user.user_id]
     );
     res.redirect("/");
   } catch (error) {
@@ -113,17 +113,17 @@ app.post("/club", async (req, res, next) => {
 });
 
 app.get("/message", (req, res) => {
-  if (!res.locals.currentUser) {
+  if (req.isUnauthenticated()) {
     return res.redirect("/log-in");
   }
   res.render("message");
 });
 app.post("/message", async (req, res, next) => {
-  if (!res.locals.currentUser) {
+  if (req.isUnauthenticated()) {
     return res.redirect("/log-in");
   }
   const body = req.body;
-  const currentUserId = res.locals.currentUser.user_id;
+  const currentUserId = req.user.user_id;
   try {
     await pool.query(
       "INSERT INTO messages (user_id, title, text, timestamp) VALUES ($1, $2, $3, $4)",
