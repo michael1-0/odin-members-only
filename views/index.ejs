@@ -15,22 +15,23 @@
       <p>member: <%= currentUser.membership_status %></p>
       <a href="/message">New Message</a>
       <a href="/log-out">LOG OUT</a>
+      <% } else { %>
+      <p>You are not currently logged in.</p>
+      <% } %>
+      
       <div class="messages-container">
         <% if (messages && messages.length > 0) { %>
           <% messages.forEach(function(message) { %>
             <div class="message" style="border: 1px solid black;">
               <p><strong><%= message.title %>:</strong> <%= message.text %></p>
-              <p><strong>author: </strong><%= locals.currentUser.membership_status ? message.first_name : "anonymous" %> </p>
-              <p class="timestamp"><%= locals.currentUser.membership_status ? message.timestamp : "anonymous" %></p>
+              <p><strong>author: </strong><%= locals.currentUser && locals.currentUser.membership_status ? message.first_name : "anonymous" %> </p>
+              <p class="timestamp"><%= locals.currentUser && locals.currentUser.membership_status ? message.timestamp : "anonymous" %></p>
             </div>
           <% }) %>
         <% } else { %>
           <p>No messages yet.</p>
         <% } %>
       </div>
-      <% } else { %>
-      <p>You are not currently logged in.</p>
-      <% } %>
     </main>
 
     <%- include('partials/footer') %>
